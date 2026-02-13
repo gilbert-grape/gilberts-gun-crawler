@@ -114,9 +114,8 @@ async def notify_new_matches(
 
     lines.append("")
 
-    # Show top matches (max 5)
-    shown_matches = new_matches[:5]
-    for match in shown_matches:
+    # Show all matches
+    for match in new_matches:
         title = match.get("title", "Unbekannt")
         price = match.get("price", "")
         url = match.get("url", "")
@@ -134,12 +133,29 @@ async def notify_new_matches(
 
         lines.append(f"• <a href=\"{url}\">{title}</a>{price_str}{source_str}")
 
-    if total_new > 5:
-        lines.append(f"\n... und {total_new - 5} weitere")
-
     message = "\n".join(lines)
 
-    return await send_telegram_message(message)
+    # Telegram has a 4096 character limit per message — split if needed
+    if len(message) <= 4096:
+        return await send_telegram_message(message)
+
+    # Split into multiple messages at line boundaries
+    chunks = []
+    current_chunk = ""
+    for line in lines:
+        if current_chunk and len(current_chunk) + len(line) + 1 > 4096:
+            chunks.append(current_chunk)
+            current_chunk = line
+        else:
+            current_chunk = f"{current_chunk}\n{line}" if current_chunk else line
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    success = True
+    for chunk in chunks:
+        if not await send_telegram_message(chunk):
+            success = False
+    return success
 
 
 async def send_test_notification() -> bool:

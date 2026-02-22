@@ -7,12 +7,11 @@ Tests the crawl orchestration:
 - Matching and persistence integration
 - Summary logging
 """
-import asyncio
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch
 from datetime import datetime, timezone
 
-from backend.database.models import Match, SearchTerm, Source
+from backend.database.models import Match, Source
 from backend.database.crud import (
     create_search_term,
     get_or_create_source,
@@ -542,7 +541,7 @@ class TestCrawlSummaryLogging:
             "waffenzimmi.ch": "https://waffenzimmi.ch",
         }, clear=True):
             with patch("backend.services.crawler._log_crawl_summary") as mock_log:
-                result = run_crawl(test_session)
+                run_crawl(test_session)
 
         # Verify _log_crawl_summary was called with the result
         mock_log.assert_called_once()
@@ -939,7 +938,7 @@ class TestRunCrawlAsyncStates:
             "waffenzimmi.ch": "https://waffenzimmi.ch",
         }, clear=True):
             _crawl_state.is_running = False
-            result = await run_crawl_async(test_session, state_prepared=False)
+            await run_crawl_async(test_session, state_prepared=False)
 
         # Only first scraper should run before cancellation is checked
         assert len(execution_order) == 1

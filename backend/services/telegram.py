@@ -6,7 +6,6 @@ Requires TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in environment.
 """
 import os
 from typing import List, Optional
-from urllib.parse import quote
 
 import httpx
 
@@ -100,7 +99,7 @@ async def notify_new_matches(
 
     # Header
     if total_new == 1:
-        lines.append(f"<b>1 neuer Treffer gefunden!</b>")
+        lines.append("<b>1 neuer Treffer gefunden!</b>")
     else:
         lines.append(f"<b>{total_new} neue Treffer gefunden!</b>")
 

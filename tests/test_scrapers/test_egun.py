@@ -14,7 +14,6 @@ import httpx
 import pytest
 
 from backend.scrapers.egun import (
-    BASE_URL,
     SOURCE_NAME,
     scrape_egun,
     _extract_image_url,

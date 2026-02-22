@@ -5,7 +5,6 @@ Tests the command-line interface for:
 - Running crawls via CLI
 """
 from unittest.mock import patch, MagicMock
-import pytest
 
 from backend.cli import main, cmd_crawl
 from backend.services.crawler import CrawlResult

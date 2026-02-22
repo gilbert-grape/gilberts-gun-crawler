@@ -14,7 +14,6 @@ import pytest
 from sqlalchemy import inspect
 
 from backend.database.models import SearchTerm, Source, Match, TimestampMixin
-from backend.database.connection import Base
 
 
 class TestTableNames:

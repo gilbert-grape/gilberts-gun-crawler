@@ -7,7 +7,6 @@ Tests verify:
 - Multiple term matching
 - Edge cases (empty inputs, missing fields)
 """
-import pytest
 
 from backend.services.matching import (
     MatchResult,

@@ -55,7 +55,7 @@ from backend.database.crud import (
     update_search_term_match_type,
     update_source_last_crawl,
 )
-from backend.database.models import AppSettings, CrawlLog, ExcludeTerm, Match, SearchTerm, Source
+from backend.database.models import ExcludeTerm, Match, SearchTerm, Source
 
 
 class TestSourceOperations:

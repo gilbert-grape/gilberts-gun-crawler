@@ -85,7 +85,6 @@ def test_db():
     # Cleanup
     test_engine.dispose()
     # Remove temporary database files
-    db_path_obj = Path(db_path)
     for suffix in ["", "-wal", "-shm"]:
         file_path = Path(str(db_path) + suffix)
         if file_path.exists():

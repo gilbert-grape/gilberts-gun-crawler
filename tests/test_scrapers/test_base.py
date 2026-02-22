@@ -356,7 +356,7 @@ class TestErrorIsolationPattern:
                         "source": "example.ch"
                     }
                 ]
-            except Exception as e:
+            except Exception:
                 return []
 
         result = await mock_successful_scraper()
@@ -373,7 +373,7 @@ class TestErrorIsolationPattern:
         async def mock_http_scraper() -> ScraperResults:
             """A scraper that fails during HTTP request."""
             try:
-                async with create_http_client() as client:
+                async with create_http_client() as _client:
                     # Simulate HTTP error
                     raise httpx.ConnectError("Connection refused")
             except Exception as e:

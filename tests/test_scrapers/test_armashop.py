@@ -8,14 +8,12 @@ Tests verify:
 - Deduplication by SKU
 - Error handling
 """
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
 
 from backend.scrapers.armashop import (
-    BASE_URL,
     SOURCE_NAME,
     scrape_armashop,
 )

@@ -277,7 +277,6 @@ class TestDashboardMarkAsSeen:
         Note: The NEU badge is now based on created_at < 7 days, not is_new flag.
         This means viewing the dashboard does NOT reset the new status.
         """
-        from datetime import datetime, timezone
 
         # First visit - recent matches should show
         response = client.get("/")

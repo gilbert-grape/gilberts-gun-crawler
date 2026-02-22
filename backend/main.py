@@ -40,9 +40,7 @@ from sqlalchemy.orm import Session
 from backend.database import (
     engine,
     get_db,
-    get_all_matches,
     get_all_search_terms,
-    get_all_search_terms_sorted,
     get_active_search_terms,
     get_search_term_by_id,
     get_search_term_by_term,
@@ -54,13 +52,11 @@ from backend.database import (
     move_search_term_down,
     get_all_sources,
     get_all_sources_sorted,
-    get_source_by_id,
     toggle_source_active,
     clear_source_error,
     move_source_up,
     move_source_down,
     get_matches_by_search_term,
-    get_new_match_count,
     mark_matches_as_seen,
     clear_all_matches,
     get_all_exclude_terms_sorted,
@@ -78,7 +74,6 @@ from backend.services.crawler import (
     run_crawl_async,
     is_crawl_running,
     get_crawl_state,
-    get_last_crawl_result,
     get_crawl_log,
     request_crawl_cancel,
     prepare_crawl_state,
@@ -444,7 +439,7 @@ async def api_get_matches(
         JSON list of matches
     """
     from sqlalchemy import desc
-    from backend.database.models import Match, Source, SearchTerm
+    from backend.database.models import Match
 
     query = db.query(Match).order_by(desc(Match.created_at))
 
@@ -453,7 +448,7 @@ async def api_get_matches(
     if search_term_id:
         query = query.filter(Match.search_term_id == search_term_id)
     if favorites_only:
-        query = query.filter(Match.is_favorite == True)
+        query = query.filter(Match.is_favorite == True)  # noqa: E712
 
     total = query.count()
     matches = query.offset(offset).limit(limit).all()
@@ -501,7 +496,7 @@ async def api_get_new_matches(
     from sqlalchemy import desc
     from backend.database.models import Match
 
-    query = db.query(Match).filter(Match.is_new == True).order_by(desc(Match.created_at))
+    query = db.query(Match).filter(Match.is_new == True).order_by(desc(Match.created_at))  # noqa: E712
     matches = query.limit(limit).all()
 
     return {

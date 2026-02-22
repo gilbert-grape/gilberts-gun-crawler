@@ -5,7 +5,7 @@ Tests the crawl control functionality:
 - 6.1: Manual crawl trigger
 - 6.2: Display crawl status
 """
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 

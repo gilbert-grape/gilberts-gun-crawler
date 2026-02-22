@@ -8,7 +8,7 @@ Supports two matching modes:
 """
 import re
 import sys
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict

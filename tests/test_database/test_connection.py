@@ -7,14 +7,11 @@ Tests verify:
 - Session factory works correctly
 - check_same_thread is disabled for async compatibility
 """
-import pytest
-from pathlib import Path
 from sqlalchemy import text
 
 from backend.database.connection import (
     engine,
     SessionLocal,
-    Base,
     get_db,
     init_db,
     DATABASE_PATH,

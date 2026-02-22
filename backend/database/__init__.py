@@ -102,6 +102,7 @@ __all__ = [
     "get_active_sources",
     "toggle_source_active",
     "update_source_last_crawl",
+    "update_source_crawl_status",
     "clear_source_error",
     "move_source_up",
     "move_source_down",

@@ -13,7 +13,6 @@ import httpx
 import pytest
 
 from backend.scrapers.waffenjoray import (
-    BASE_URL,
     SOURCE_NAME,
     scrape_waffenjoray,
     _parse_search_result_dt,

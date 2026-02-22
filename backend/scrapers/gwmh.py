@@ -17,7 +17,6 @@ from backend.scrapers.base import (
     ScraperResults,
     create_http_client,
     delay_between_requests,
-    make_absolute_url,
     parse_price,
 )
 from backend.utils.logging import get_logger

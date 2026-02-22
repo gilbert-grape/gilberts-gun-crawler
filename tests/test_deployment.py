@@ -9,7 +9,6 @@ Tests the deployment configuration files:
 - 7.5: Deployment documentation
 """
 from pathlib import Path
-import pytest
 
 
 # Get project root

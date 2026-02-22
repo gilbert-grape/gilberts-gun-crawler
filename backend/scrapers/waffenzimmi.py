@@ -105,7 +105,7 @@ async def scrape_waffenzimmi(search_terms: Optional[List[str]] = None) -> Scrape
                         product_links = soup.select("a[href*='/produkt/']")
                         if product_links:
                             listings = [_find_listing_container(elem) for elem in product_links]
-                            listings = [l for l in listings if l is not None]
+                            listings = [item for item in listings if item is not None]
                             # Deduplicate by element id
                             seen_ids = set()
                             unique_listings = []

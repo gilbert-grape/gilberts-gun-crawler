@@ -7,10 +7,9 @@ Tests the is_new flag behavior and last_seen_at tracking:
 - Matches created after marking are still new
 - last_seen_at is updated when marking seen
 """
-import pytest
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
-from backend.database.models import AppSettings, Match, SearchTerm, Source
+from backend.database.models import AppSettings, Match
 from backend.database.crud import (
     get_app_settings,
     mark_matches_as_seen,

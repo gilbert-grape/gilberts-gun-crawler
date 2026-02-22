@@ -13,7 +13,6 @@ import httpx
 import pytest
 
 from backend.scrapers.gwmh import (
-    BASE_URL,
     SOURCE_NAME,
     scrape_gwmh,
     _parse_jsonp_response,

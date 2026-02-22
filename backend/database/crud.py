@@ -9,7 +9,7 @@ Provides functions for:
 - Crawl log history
 """
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
@@ -88,7 +88,7 @@ def get_active_sources(session: Session) -> List[Source]:
     Returns:
         List of active Source records sorted by sort_order
     """
-    return session.query(Source).filter(Source.is_active == True).order_by(Source.sort_order).all()
+    return session.query(Source).filter(Source.is_active == True).order_by(Source.sort_order).all()  # noqa: E712
 
 
 def update_source_crawl_status(
@@ -308,7 +308,7 @@ def get_active_search_terms(session: Session) -> List[SearchTerm]:
         List of active SearchTerm records ordered by sort_order
     """
     return session.query(SearchTerm).filter(
-        SearchTerm.is_active == True
+        SearchTerm.is_active == True  # noqa: E712
     ).order_by(SearchTerm.sort_order).all()
 
 
@@ -644,7 +644,7 @@ def get_active_exclude_terms(session: Session) -> List[ExcludeTerm]:
     Returns:
         List of active ExcludeTerm records
     """
-    return session.query(ExcludeTerm).filter(ExcludeTerm.is_active == True).all()
+    return session.query(ExcludeTerm).filter(ExcludeTerm.is_active == True).all()  # noqa: E712
 
 
 def get_exclude_term_by_id(session: Session, term_id: int) -> Optional[ExcludeTerm]:
@@ -963,7 +963,7 @@ def get_new_matches(session: Session) -> List[Match]:
         List of Match records where is_new=True
     """
     return session.query(Match).filter(
-        Match.is_new == True
+        Match.is_new == True  # noqa: E712
     ).order_by(Match.created_at.desc()).all()
 
 
@@ -1015,7 +1015,7 @@ def mark_matches_as_seen(session: Session) -> int:
     """
     # Update all matches with is_new=True to is_new=False
     count = session.query(Match).filter(
-        Match.is_new == True
+        Match.is_new == True  # noqa: E712
     ).update({Match.is_new: False})
 
     # Update last_seen_at timestamp
@@ -1054,7 +1054,7 @@ def get_new_match_count(session: Session) -> int:
     Returns:
         Number of matches where is_new=True
     """
-    return session.query(Match).filter(Match.is_new == True).count()
+    return session.query(Match).filter(Match.is_new == True).count()  # noqa: E712
 
 
 def clear_all_matches(session: Session) -> int:
@@ -1259,7 +1259,7 @@ def get_favorite_matches(session: Session) -> List[Match]:
         List of Match records where is_favorite=True
     """
     return session.query(Match).filter(
-        Match.is_favorite == True
+        Match.is_favorite == True  # noqa: E712
     ).order_by(Match.created_at.desc()).all()
 
 
@@ -1273,4 +1273,4 @@ def get_favorite_count(session: Session) -> int:
     Returns:
         Number of matches where is_favorite=True
     """
-    return session.query(Match).filter(Match.is_favorite == True).count()
+    return session.query(Match).filter(Match.is_favorite == True).count()  # noqa: E712

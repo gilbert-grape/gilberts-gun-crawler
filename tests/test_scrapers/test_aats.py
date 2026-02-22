@@ -13,7 +13,6 @@ import httpx
 import pytest
 
 from backend.scrapers.aats import (
-    BASE_URL,
     SOURCE_NAME,
     scrape_aats,
 )

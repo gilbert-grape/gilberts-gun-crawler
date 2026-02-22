@@ -30,7 +30,6 @@ from backend.database.crud import (
     update_crawl_log,
     update_source_crawl_status,
 )
-from backend.database.models import Source
 from backend.scrapers import (
     ScraperResults,
     scrape_aats,

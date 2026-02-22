@@ -10,7 +10,6 @@ Tests verify:
 """
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
 from sqlalchemy import create_engine, inspect

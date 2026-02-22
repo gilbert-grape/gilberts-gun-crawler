@@ -15,7 +15,6 @@ from backend.scrapers.base import (
     ScraperResult,
     ScraperResults,
     create_http_client,
-    delay_between_requests,
 )
 from backend.utils.logging import get_logger
 
@@ -67,7 +66,7 @@ async def scrape_aats(search_terms: Optional[List[str]] = None) -> ScraperResult
         from backend.services.crawler import is_cancel_requested
 
         async with create_http_client() as client:
-            add_crawl_log(f"  Lade Sitemap...")
+            add_crawl_log("  Lade Sitemap...")
 
             # Fetch sitemap
             response = await client.get(SITEMAP_URL)

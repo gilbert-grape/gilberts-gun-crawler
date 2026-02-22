@@ -8,10 +8,7 @@ Tests verify:
 - verify_database() succeeds with complete database
 - FastAPI routes return correct responses
 """
-import os
-import tempfile
-from pathlib import Path
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch, MagicMock
 
 import pytest
 from fastapi.testclient import TestClient

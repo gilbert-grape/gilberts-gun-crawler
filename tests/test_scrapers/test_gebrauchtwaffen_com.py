@@ -18,6 +18,7 @@ from backend.scrapers.gebrauchtwaffen import (
     SOURCE_NAME,
     scrape_gebrauchtwaffen,
     _has_next_page,
+    _pad_short_term,
     _parse_listing,
 )
 from bs4 import BeautifulSoup
@@ -85,6 +86,34 @@ SAMPLE_HTML_MISSING_FIELDS = """
 </body>
 </html>
 """
+
+
+class TestPadShortTerm:
+    """Tests for _pad_short_term helper."""
+
+    def test_pads_two_char_term(self):
+        """Two-character terms get wildcard appended."""
+        assert _pad_short_term("CZ") == "CZ*"
+
+    def test_pads_one_char_term(self):
+        """Single-character terms get wildcard appended."""
+        assert _pad_short_term("K") == "K*"
+
+    def test_does_not_pad_three_char_term(self):
+        """Three-character terms are left unchanged."""
+        assert _pad_short_term("SIG") == "SIG"
+
+    def test_does_not_pad_long_term(self):
+        """Long terms are left unchanged."""
+        assert _pad_short_term("Glock 17") == "Glock 17"
+
+    def test_strips_whitespace_before_checking(self):
+        """Whitespace-padded short terms still get wildcard."""
+        assert _pad_short_term(" CZ ") == "CZ*"
+
+    def test_empty_term(self):
+        """Empty term gets wildcard."""
+        assert _pad_short_term("") == "*"
 
 
 class TestParseListing:
@@ -271,6 +300,27 @@ class TestScrapeGebrauchtwaffen:
 
         # Should only have 2 unique results (not 4)
         assert len(results) == 2
+
+    @pytest.mark.asyncio
+    async def test_pads_short_search_term_in_url(self):
+        """Test that short search terms get wildcard appended in the request URL."""
+        mock_response = MagicMock()
+        mock_response.text = SAMPLE_HTML_RESULTS
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.get = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("backend.scrapers.gebrauchtwaffen.create_http_client", return_value=mock_client):
+            with patch("backend.scrapers.gebrauchtwaffen.delay_between_requests", new_callable=AsyncMock):
+                with patch("backend.services.crawler.add_crawl_log"):
+                    await scrape_gebrauchtwaffen(search_terms=["CZ"])
+
+        # Verify the URL used "CZ*" (encoded as CZ%2A)
+        called_url = mock_client.get.call_args[0][0]
+        assert "CZ%2A" in called_url or "CZ*" in called_url
 
     @pytest.mark.asyncio
     async def test_handles_no_results_page(self):

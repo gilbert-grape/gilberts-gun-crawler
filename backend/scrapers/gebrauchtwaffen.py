@@ -28,6 +28,19 @@ BASE_URL = "https://www.gebrauchtwaffen.com"
 SEARCH_URL = f"{BASE_URL}/index.php"
 SOURCE_NAME = "gebrauchtwaffen.com"
 MAX_PAGES = 5  # Max pages per search term
+MIN_SEARCH_LENGTH = 3  # Server rejects searches shorter than 3 characters
+
+
+def _pad_short_term(term: str) -> str:
+    """Append wildcard '*' to search terms shorter than MIN_SEARCH_LENGTH.
+
+    The gebrauchtwaffen.com server returns 404 for search terms with fewer
+    than 3 characters. Appending '*' acts as a wildcard and bypasses this
+    restriction without affecting results for longer terms.
+    """
+    if len(term.strip()) < MIN_SEARCH_LENGTH:
+        return term.strip() + "*"
+    return term
 
 
 async def scrape_gebrauchtwaffen(search_terms: Optional[List[str]] = None) -> ScraperResults:
@@ -71,7 +84,9 @@ async def scrape_gebrauchtwaffen(search_terms: Optional[List[str]] = None) -> Sc
                     logger.info(f"{SOURCE_NAME} - Cancelled by user")
                     return results
 
-                add_crawl_log(f"  → Suche: '{term}'")
+                # Pad short terms with wildcard to bypass server minimum length
+                search_term = _pad_short_term(term)
+                add_crawl_log(f"  → Suche: '{term}'" + (f" (→ '{search_term}')" if search_term != term else ""))
 
                 page = 1
                 while page <= MAX_PAGES:
@@ -81,7 +96,7 @@ async def scrape_gebrauchtwaffen(search_terms: Optional[List[str]] = None) -> Sc
                         return results
 
                     # Construct search URL
-                    encoded_term = quote_plus(term)
+                    encoded_term = quote_plus(search_term)
                     url = f"{SEARCH_URL}?page=search&sPattern={encoded_term}"
                     if page > 1:
                         url += f"&iPage,{page}"

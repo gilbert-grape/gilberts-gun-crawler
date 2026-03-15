@@ -50,6 +50,7 @@ from backend.scrapers.vnsm import scrape_vnsm
 from backend.scrapers.ellie import scrape_ellie
 from backend.scrapers.egun import scrape_egun
 from backend.scrapers.gebrauchtwaffen import scrape_gebrauchtwaffen
+from backend.scrapers.swissarsenal import scrape_swissarsenal
 
 __all__ = [
     # Type definitions
@@ -81,4 +82,5 @@ __all__ = [
     "scrape_ellie",
     "scrape_egun",
     "scrape_gebrauchtwaffen",
+    "scrape_swissarsenal",
 ]

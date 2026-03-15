@@ -1,8 +1,12 @@
 """
 vnsm.ch Scraper
 
-Scrapes firearms listings from vnsm.ch using their search functionality.
-Site is based on PrestaShop with Leo Product Search module.
+Scrapes firearms listings from vnsm.ch (PrestaShop-based).
+Two-phase approach:
+1) Always browses weapon category pages (Kurzwaffen, Langwaffen, Vollautomatische).
+2) Uses search for terms >= 3 characters.
+Short terms (< 3 chars, e.g. "CZ") are covered by the category crawl,
+since PrestaShop requires a minimum of 3 characters for search.
 """
 import re
 from typing import List, Optional
@@ -26,14 +30,26 @@ BASE_URL = "https://www.vnsm.ch"
 SEARCH_URL = f"{BASE_URL}/recherche"
 SOURCE_NAME = "vnsm.ch"
 MAX_PAGES = 5  # Max pages per search term
+MIN_SEARCH_LENGTH = 3  # PrestaShop minimum search length
+MAX_CATEGORY_PAGES = 10
+
+# Weapon category pages - always crawled
+CATEGORY_URLS = [
+    f"{BASE_URL}/8-armes-de-poing",
+    f"{BASE_URL}/7-armes-longues",
+    f"{BASE_URL}/16-armes-automatiques",
+]
 
 
 async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResults:
     """
-    Scrape listings from vnsm.ch using search.
+    Scrape listings from vnsm.ch.
 
-    This scraper uses the site's search functionality to find relevant listings.
-    If no search_terms are provided, it will fetch them from the database.
+    Two-phase approach:
+    1) Always browses weapon category pages (armes de poing, armes longues, automatiques).
+    2) Uses search for terms with >= 3 characters.
+    Short terms (< 3 chars) are covered by the category crawl,
+    since PrestaShop rejects searches under 3 characters.
 
     Args:
         search_terms: Optional list of search terms. If None, fetches from database.
@@ -56,6 +72,9 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
         logger.warning(f"{SOURCE_NAME} - No search terms to search for")
         return []
 
+    # Only terms >= 3 chars can use PrestaShop search
+    searchable_terms = [t for t in search_terms if len(t) >= MIN_SEARCH_LENGTH]
+
     results: ScraperResults = []
     seen_links = set()  # Deduplicate results across searches
 
@@ -63,8 +82,60 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
         from backend.services.crawler import is_cancel_requested
 
         async with create_http_client() as client:
-            for term in search_terms:
-                # Check for cancellation between search terms
+            # 1) Always browse weapon category pages
+            add_crawl_log(f"  → Durchsuche Waffen-Kategorien...")
+            for cat_url in CATEGORY_URLS:
+                if is_cancel_requested():
+                    logger.info(f"{SOURCE_NAME} - Cancelled by user")
+                    return results
+
+                cat_name = cat_url.split("/")[-1]
+                add_crawl_log(f"    Kategorie: {cat_name}")
+
+                page = 1
+                while page <= MAX_CATEGORY_PAGES:
+                    if is_cancel_requested():
+                        logger.info(f"{SOURCE_NAME} - Cancelled by user")
+                        return results
+
+                    url = cat_url if page == 1 else f"{cat_url}?page={page}"
+
+                    response = await client.get(url)
+                    response.raise_for_status()
+
+                    soup = BeautifulSoup(response.text, "html.parser")
+                    listings = soup.select("article.product-miniature")
+
+                    if not listings:
+                        break
+
+                    page_results = 0
+                    for listing in listings:
+                        try:
+                            result = _parse_listing(listing)
+                            if result and result["link"] not in seen_links:
+                                seen_links.add(result["link"])
+                                results.append(result)
+                                page_results += 1
+                        except Exception as e:
+                            logger.warning(f"{SOURCE_NAME} - Failed to parse listing: {e}")
+                            continue
+
+                    logger.debug(f"{SOURCE_NAME} - Category '{cat_name}' page {page}: found {page_results} new listings")
+
+                    if page_results == 0 or not _has_next_page(soup, page):
+                        break
+
+                    page += 1
+                    if page <= MAX_CATEGORY_PAGES:
+                        await delay_between_requests()
+
+                await delay_between_requests()
+
+            add_crawl_log(f"    Kategorien: {len(results)} Inserate")
+
+            # 2) Search-based scraping for terms >= 3 characters
+            for term in searchable_terms:
                 if is_cancel_requested():
                     logger.info(f"{SOURCE_NAME} - Cancelled by user")
                     return results
@@ -73,11 +144,10 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
 
                 page = 1
                 while page <= MAX_PAGES:
-                    # Check for cancellation between pages
                     if is_cancel_requested():
                         logger.info(f"{SOURCE_NAME} - Cancelled by user")
                         return results
-                    # Construct search URL with query parameter
+
                     encoded_term = quote_plus(term)
                     url = f"{SEARCH_URL}?s={encoded_term}"
                     if page > 1:
@@ -87,10 +157,7 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
                     response = await client.get(url)
                     response.raise_for_status()
 
-                    # Parse HTML
                     soup = BeautifulSoup(response.text, "html.parser")
-
-                    # Find all product items - PrestaShop uses article.product-miniature
                     listings = soup.select("article.product-miniature")
 
                     if not listings:
@@ -112,7 +179,6 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
 
                     logger.debug(f"{SOURCE_NAME} - Search '{term}' page {page}: found {page_results} new listings")
 
-                    # Check if there's a next page
                     if not _has_next_page(soup, page) or page_results == 0:
                         break
 
@@ -120,7 +186,6 @@ async def scrape_vnsm(search_terms: Optional[List[str]] = None) -> ScraperResult
                     if page <= MAX_PAGES:
                         await delay_between_requests()
 
-                # Delay between search terms
                 await delay_between_requests()
 
             logger.info(f"{SOURCE_NAME} - Scraped {len(results)} unique listings total")

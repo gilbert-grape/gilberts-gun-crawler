@@ -11,7 +11,7 @@
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-    <link rel="manifest" href="/static/manifest.json">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -64,7 +64,7 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/sw.js')
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
                     .then(reg => console.log('SW registered'))
                     .catch(err => console.log('SW registration failed:', err));
             });

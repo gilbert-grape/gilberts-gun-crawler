@@ -31,6 +31,7 @@ from typing import Optional
 from urllib.parse import unquote
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
@@ -194,6 +195,26 @@ app = FastAPI(
 # Ensure static files directory exists
 STATIC_DIR = FRONTEND_DIR / "public"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+
+# PWA: Serve service worker and manifest from root scope
+# Service worker must be at root to control all pages
+@app.get("/sw.js", include_in_schema=False)
+async def service_worker():
+    return FileResponse(
+        str(STATIC_DIR / "sw.js"),
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/"},
+    )
+
+
+@app.get("/manifest.json", include_in_schema=False)
+async def manifest():
+    return FileResponse(
+        str(STATIC_DIR / "manifest.json"),
+        media_type="application/manifest+json",
+    )
+
 
 # Mount static files with absolute path
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#2563eb" rx="64"/>
+  <g fill="white" transform="translate(256,256) scale(4.2) translate(-50,-50)">
+    <!-- Head -->
+    <circle cx="50" cy="28" r="10"/>
+    <!-- Body -->
+    <ellipse cx="50" cy="52" rx="8" ry="15"/>
+    <!-- Arms stretched up -->
+    <path d="M34 40 Q30 30 38 22" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M66 40 Q70 30 62 22" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Legs crossed -->
+    <ellipse cx="40" cy="72" rx="12" ry="5"/>
+    <ellipse cx="60" cy="72" rx="12" ry="5"/>
+  </g>
+</svg>

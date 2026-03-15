@@ -46,6 +46,7 @@ from backend.scrapers import (
     scrape_waffengebraucht,
     scrape_waffenjoray,
     scrape_waffenzimmi,
+    scrape_swissarsenal,
 )
 from backend.services.matching import find_matches
 from backend.services.telegram import notify_new_matches, is_telegram_configured
@@ -279,6 +280,7 @@ SCRAPER_REGISTRY: Dict[str, AsyncScraperFunc] = {
     "waffengebraucht.ch": scrape_waffengebraucht,
     "waffen-joray.ch": scrape_waffenjoray,
     "waffenzimmi.ch": scrape_waffenzimmi,
+    "swissarsenal.com": scrape_swissarsenal,
 }
 
 # Base URLs for each source (used when creating sources)
@@ -297,6 +299,7 @@ SOURCE_BASE_URLS: Dict[str, str] = {
     "waffengebraucht.ch": "https://waffengebraucht.ch",
     "waffen-joray.ch": "https://waffen-joray.ch",
     "waffenzimmi.ch": "https://www.waffenzimmi.ch",
+    "swissarsenal.com": "https://www.swissarsenal.com",
 }
 
 

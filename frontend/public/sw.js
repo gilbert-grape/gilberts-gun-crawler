@@ -1,7 +1,7 @@
 // Service Worker for Gilbert's Yoga Helper
 // Provides offline caching for pages and API data
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = `yoga-helper-${CACHE_VERSION}`;
 
 // Pages to pre-cache on install
@@ -12,8 +12,8 @@ const PRECACHE_URLS = [
   '/admin/sources',
   '/admin/crawl',
   '/static/favicon.svg',
-  '/static/icons/icon-192.svg',
-  '/static/icons/icon-512.svg'
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png'
 ];
 
 // External CDN resources to cache
